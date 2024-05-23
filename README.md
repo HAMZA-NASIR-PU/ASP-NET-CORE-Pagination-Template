@@ -2,3 +2,4 @@
 
 - Events Database.
 - MYSQL Database.
+- .NET 8.0
