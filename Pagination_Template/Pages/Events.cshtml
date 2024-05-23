@@ -3,10 +3,10 @@
 @{
 }
 
-<h2>Product List</h2>
+<h2>Event List</h2>
 
-<div id="productTable">
-    <!-- Product Table Will Be Dynamically Loaded Here -->
+<div id="eventTable">
+    <!-- Event Table Will Be Dynamically Loaded Here -->
 </div>
 
 <nav aria-label="Page navigation">
@@ -18,23 +18,33 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
         var token = $('input[name="__RequestVerificationToken"]').val();
+        var currentSortField = 'id'; // Default sort field
+        var currentSortOrder = 'asc'; // Default sort order
+        var currentPage = 1; // Current page
 
-        function loadPage(pageNumber) {
+        function loadPage(pageNumber, sortField) {
+
+            // Update current page
+            currentPage = pageNumber;
             $.ajax({
                 url: '@Url.Page("/ProductList")',
                 type: 'GET',
-                data: { pageNumber: pageNumber },
+                data: {
+                    pageNumber: pageNumber,
+                    sortOrder: currentSortOrder,
+                    sortField: currentSortField
+                },
                 headers: {
                     'X-CSRF-TOKEN': token
                 },
                 success: function (data) {
                     // Populate the product table
-                    var productTable = '<table class="table table-striped table-hover"><thead><tr><th>Id</th><th>Name</th><th>Price</th></tr></thead><tbody>';
+                    var eventTable = '<table class="table table-striped table-hover"><thead><tr><th><a href="#" onclick="changeSortField(\'id\')">ID</a></th><th><a href="#" onclick="changeSortField(\'title\')">Title</a></th><th><a href="#" onclick="changeSortField(\'start_date\')">Start Date</a></th><th><a href="#" onclick="changeSortField(\'end_date\')">End Date</a></th></tr></thead><tbody>';
                     data.paginatedList.items.forEach(function (item) {
-                        productTable += '<tr><td>' + item.id + '</td><td>' + item.title + '</td><td>' + item.startDate + '</td></tr>';
+                        eventTable += '<tr><td>' + item.id + '</td><td>' + item.title + '</td><td>' + item.startDate + '</td><td>' + item.endDate + '</td></tr>';
                     });
-                    productTable += '</tbody></table>';
-                    $('#productTable').html(productTable);
+                    eventTable += '</tbody></table>';
+                    $('#eventTable').html(eventTable);
 
                     // Populate the pagination controls
                     var pagination = '';
@@ -79,8 +89,21 @@
             });
         }
 
+        function changeSortField(sortField) {
+            // Toggle sort order if the same field is clicked again
+            if (sortField === currentSortField) {
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortOrder = 'asc'; // Reset sort order to asc if different field is clicked
+            }
+            currentSortField = sortField; // Update current sort field
+
+            // Reload the current page with the updated sort field and order
+            loadPage(currentPage);
+        }
+
         $(document).ready(function () {
-            loadPage(1); // Load the first page by default
+            loadPage(1, currentSortField); // Load the first page by default with sorting by id in ascending order
         });
     </script>
 }

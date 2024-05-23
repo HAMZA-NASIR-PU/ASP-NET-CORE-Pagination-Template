@@ -18,30 +18,47 @@ namespace Pagination_Template.Pages
 		}
 
 		[BindProperty]
-		public PaginatedList<Event> Products { get; set; }
+		public PaginatedList<Event> Events { get; set; }
 
-		public async Task<IActionResult> OnGetAsync(int? pageNumber)
-		{
-			int pageSize = 10;
-			var products = _context.Events.AsNoTracking();
-			Products = await PaginatedList<Event>.CreateAsync(products, pageNumber ?? 1, pageSize);
+        public async Task<IActionResult> OnGetAsync(int? pageNumber, string sortOrder, string sortField)
+        {
+            int pageSize = 10;
+            var events = _context.Events.AsNoTracking();
 
-			if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-			{
-				return new JsonResult(new
-				{
-					paginatedList = new
-					{
-						items = Products,
-						totalPages = Products.TotalPages,
-						pageIndex = Products.PageIndex,
-						hasPreviousPage = Products.HasPreviousPage,
-						hasNextPage = Products.HasNextPage
-					}
-				});
-			}
+            switch (sortField)
+            {
+                case "title":
+                    events = sortOrder == "asc" ? events.OrderBy(e => e.Title) : events.OrderByDescending(e => e.Title);
+                    break;
+                case "start_date":
+                    events = sortOrder == "asc" ? events.OrderBy(e => e.StartDate) : events.OrderByDescending(e => e.StartDate);
+                    break;
+                case "end_date":
+                    events = sortOrder == "asc" ? events.OrderBy(e => e.EndDate) : events.OrderByDescending(e => e.EndDate);
+                    break;
+                default:
+                    events = sortOrder == "asc" ? events.OrderBy(e => e.Id) : events.OrderByDescending(e => e.Id); // Default sorting by id
+                    break;
+            }
 
-			return Page();
-		}
-	}
+            Events = await PaginatedList<Event>.CreateAsync(events, pageNumber ?? 1, pageSize);
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return new JsonResult(new
+                {
+                    paginatedList = new
+                    {
+                        items = Events,
+                        totalPages = Events.TotalPages,
+                        pageIndex = Events.PageIndex,
+                        hasPreviousPage = Events.HasPreviousPage,
+                        hasNextPage = Events.HasNextPage
+                    }
+                });
+            }
+
+            return Page();
+        }
+    }
 }
