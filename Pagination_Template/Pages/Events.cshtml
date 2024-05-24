@@ -49,9 +49,16 @@
                     </div>
                     <div class="mb-3">
                         <label for="editStartDate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="editStartDate" name="startDate" required>
+                        <input type="datetime-local" class="form-control" id="editStartDate" name="startDate" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <div class="mb-3">
+                        <label for="editEndDate" class="form-label">End Date</label>
+                        <input type="datetime-local" class="form-control" id="editEndDate" name="endDate" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" form="editForm" class="btn btn-primary">Save changes</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -81,7 +88,7 @@
             // Update current page
             currentPage = pageNumber;
             $.ajax({
-                url: '@Url.Page("/ProductList")',
+                url: '@Url.Page("/Events")',
                 type: 'GET',
                 data: {
                     pageNumber: pageNumber,
@@ -102,7 +109,7 @@
                         '</tr></thead><tbody>';
                     data.paginatedList.items.forEach(function (item) {
                         eventTable += '<tr><td>' + item.id + '</td><td>' + item.title + '</td><td>' + item.startDate + '</td><td>' + item.endDate + '</td>' +
-                            '<td><button class="btn btn-primary btn-sm" onclick="showEditModal(' + item.id + ', \'' + item.title + '\', \'' + item.startDate + '\')"><i class="bi bi-pencil-square"></i> Edit</button> ' +
+                            '<td><button class="btn btn-primary btn-sm" onclick="showEditModal(' + item.id + ', \'' + item.title + '\', \'' + item.startDate + '\', \'' + item.endDate + '\')"><i class="bi bi-pencil-square"></i> Edit</button> ' +
                             '<button class="btn btn-danger btn-sm" onclick="showDeleteModal(' + item.id + ')"><i class="bi bi-trash"></i> Delete</button></td></tr>';
                     });
                     eventTable += '</tbody></table>';
@@ -163,18 +170,20 @@
             $('#deleteModal').modal('show');
         }
 
-        function showEditModal(eventId, title, startDate) {
+        function showEditModal(eventId, title, startDate, endDate) {
             $('#editEventId').val(eventId);
             $('#editTitle').val(title);
             $('#editStartDate').val(startDate);
+            $('#editEndDate').val(endDate);
             $('#editModal').modal('show');
         }
 
         $('#confirmDeleteBtn').click(function () {
             var eventId = $(this).attr('data-event-id');
+            debugger;
             // Perform delete operation
             $.ajax({
-                url: '@Url.Page("/Events")?handler=Delete',
+                url: '@Url.Page("/Events", "Delete")', // Adjust the URL if necessary
                 type: 'POST',
                 data: { id: eventId },
                 headers: {
@@ -199,7 +208,8 @@
             $.ajax({
                 url: '@Url.Page("/Events")?handler=Edit',
                 type: 'POST',
-                data: form, headers: {
+                data: formData,
+                headers: {
                     'X-CSRF-TOKEN': token
                 },
                 success: function (data) {

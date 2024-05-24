@@ -60,5 +60,20 @@ namespace Pagination_Template.Pages
 
             return Page();
         }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            var eventToDelete = await _context.Events.FindAsync(id);
+
+            if (eventToDelete == null)
+            {
+                return NotFound();
+            }
+
+            _context.Events.Remove(eventToDelete);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new { success = true, message = "Event deleted successfully." });
+        }
     }
 }
