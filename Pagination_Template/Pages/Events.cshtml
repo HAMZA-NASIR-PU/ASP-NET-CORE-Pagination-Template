@@ -151,19 +151,6 @@
             });
         }
 
-        // function changeSortField(sortField) {
-        //     // Toggle sort order if the same field is clicked again
-        //     if (sortField === currentSortField) {
-        //         currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
-        //     } else {
-        //         currentSortOrder = 'asc'; // Reset sort order to asc if different field is clicked
-        //     }
-        //     currentSortField = sortField; // Update current sort field
-
-        //     // Reload the current page with the updated sort field and order
-        //     loadPage(currentPage);
-        // }
-
         function getSortIcon(field) {
             if (sortField === field) {
                 return sortOrder === 'asc' ? '<i class="bi bi-arrow-up"></i>' : '<i class="bi bi-arrow-down"></i>';
