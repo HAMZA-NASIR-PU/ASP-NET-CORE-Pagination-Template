@@ -13,7 +13,6 @@
         <!-- Pagination Links Will Be Dynamically Loaded Here -->
     </ul>
 </nav>
-
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -61,13 +60,16 @@
 
 @section Styles {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.7.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        th[data-field] {
+            cursor: pointer;
+        }
+    </style>
 }
-
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-EEJmJnLxJUWCBfh8Dzi4mII6z4/uPOXfi2aC6j9vGV2alx8bzGaw1pAeKkHHtu5u" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-
     <script type="text/javascript">
         var token = $('input[name="__RequestVerificationToken"]').val();
         var currentPage = 1;
@@ -75,25 +77,31 @@
         var sortOrder = 'asc';
 
         function loadPage(pageNumber) {
+
+            // Update current page
             currentPage = pageNumber;
             $.ajax({
-                url: '@Url.Page("/Events")',
+                url: '@Url.Page("/ProductList")',
                 type: 'GET',
-                data: { pageNumber: pageNumber, sortField: sortField, sortOrder: sortOrder },
+                data: {
+                    pageNumber: pageNumber,
+                    sortOrder: sortOrder,
+                    sortField: sortField
+                },
                 headers: {
                     'X-CSRF-TOKEN': token
                 },
                 success: function (data) {
-                    debugger;
-                    // Populate the event table
+                    // Populate the product table
                     var eventTable = '<table class="table table-striped table-hover"><thead><tr>' +
                         '<th data-field="id">ID ' + getSortIcon('id') + '</th>' +
                         '<th data-field="title">Title ' + getSortIcon('title') + '</th>' +
-                        '<th data-field="startDate">Start Date ' + getSortIcon('startDate') + '</th>' +
+                        '<th data-field="start_date">Start Date ' + getSortIcon('start_date') + '</th>' +
+                        '<th data-field="end_date">End Date ' + getSortIcon('end_date') + '</th>' +
                         '<th>Actions</th>' +
                         '</tr></thead><tbody>';
                     data.paginatedList.items.forEach(function (item) {
-                        eventTable += '<tr><td>' + item.id + '</td><td>' + item.title + '</td><td>' + item.startDate + '</td>' +
+                        eventTable += '<tr><td>' + item.id + '</td><td>' + item.title + '</td><td>' + item.startDate + '</td><td>' + item.endDate + '</td>' +
                             '<td><button class="btn btn-primary btn-sm" onclick="showEditModal(' + item.id + ', \'' + item.title + '\', \'' + item.startDate + '\')"><i class="bi bi-pencil-square"></i> Edit</button> ' +
                             '<button class="btn btn-danger btn-sm" onclick="showDeleteModal(' + item.id + ')"><i class="bi bi-trash"></i> Delete</button></td></tr>';
                     });
@@ -142,6 +150,19 @@
                 }
             });
         }
+
+        // function changeSortField(sortField) {
+        //     // Toggle sort order if the same field is clicked again
+        //     if (sortField === currentSortField) {
+        //         currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        //     } else {
+        //         currentSortOrder = 'asc'; // Reset sort order to asc if different field is clicked
+        //     }
+        //     currentSortField = sortField; // Update current sort field
+
+        //     // Reload the current page with the updated sort field and order
+        //     loadPage(currentPage);
+        // }
 
         function getSortIcon(field) {
             if (sortField === field) {
@@ -220,7 +241,7 @@
         });
 
         $(document).ready(function () {
-            loadPage(1); // Load the first page by default
+            loadPage(1); // Load the first page by default with sorting by id in ascending order
         });
     </script>
 }

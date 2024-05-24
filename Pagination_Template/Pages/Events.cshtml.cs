@@ -60,20 +60,5 @@ namespace Pagination_Template.Pages
 
             return Page();
         }
-
-        [HttpDelete]
-        public async Task<IActionResult> OnPostDeleteAsync([FromBody] int id)
-        {
-            var eventToDelete = await _context.Events.FindAsync(id);
-            if (eventToDelete == null)
-            {
-                return new JsonResult(new { success = false, message = "Event not found" });
-            }
-
-            _context.Events.Remove(eventToDelete);
-            await _context.SaveChangesAsync();
-
-            return new JsonResult(new { success = true });
-        }
     }
 }
