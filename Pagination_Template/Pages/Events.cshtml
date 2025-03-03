@@ -82,6 +82,12 @@
         var currentPage = 1;
         var sortField = 'id';
         var sortOrder = 'asc';
+        const columns = [
+            { field: "id", label: "ID" },
+            { field: "title", label: "Title" },
+            { field: "start_date", label: "Start Date" },
+            { field: "end_date", label: "End Date" },
+        ];
 
         function loadPage(pageNumber) {
 
@@ -100,18 +106,45 @@
                 },
                 success: function (data) {
                     // Populate the product table
-                    var eventTable = '<table class="table table-striped table-hover"><thead><tr>' +
-                        '<th data-field="id">ID ' + getSortIcon('id') + '</th>' +
-                        '<th data-field="title">Title ' + getSortIcon('title') + '</th>' +
-                        '<th data-field="start_date">Start Date ' + getSortIcon('start_date') + '</th>' +
-                        '<th data-field="end_date">End Date ' + getSortIcon('end_date') + '</th>' +
-                        '<th>Actions</th>' +
-                        '</tr></thead><tbody>';
-                    data.paginatedList.items.forEach(function (item) {
-                        eventTable += '<tr><td>' + item.id + '</td><td>' + item.title + '</td><td>' + item.startDate + '</td><td>' + item.endDate + '</td>' +
-                            '<td><button class="btn btn-primary btn-sm" onclick="showEditModal(' + item.id + ', \'' + item.title + '\', \'' + item.startDate + '\', \'' + item.endDate + '\')"><i class="bi bi-pencil-square"></i> Edit</button> ' +
-                            '<button class="btn btn-danger btn-sm" onclick="showDeleteModal(' + item.id + ')"><i class="bi bi-trash"></i> Delete</button></td></tr>';
+                    
+
+                    let eventTable = `
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    ${columns
+                                                            .map(
+                                                                    ({ field, label }) =>
+                                                                    `<th data-field="${field}">${label} ${getSortIcon(field)}</th>`
+                                                                )
+                                                            .join("")}
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                           <tbody>
+        `;
+
+                    console.log(eventTable);
+
+                    data.paginatedList.items.forEach(({ id, title, startDate, endDate }) => {
+                        eventTable += `
+                                    <tr>
+                                        <td>${id}</td>
+                                        <td>${title}</td>
+                                        <td>${startDate}</td>
+                                        <td>${endDate}</td>
+                                        <td>
+                                        <button class="btn btn-primary btn-sm" onclick="showEditModal(${id}, '${title}', '${startDate}', '${endDate}')">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="showDeleteModal(${id})">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                        </td>
+                                    </tr>
+                                    `;
                     });
+
                     eventTable += '</tbody></table>';
                     $('#eventTable').html(eventTable);
 
